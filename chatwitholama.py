@@ -9,6 +9,18 @@ from langchain_core.output_parsers import JsonOutputParser # ensure JSON input f
 from operator import itemgetter # to retrieve specific items in our chain.
 
 
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
+import requests
+
+session = requests.Session()
+retry = Retry(connect=3, backoff_factor=0.5)
+adapter = HTTPAdapter(max_retries=retry)
+session.mount('http://', adapter)
+
+response = session.get('http://localhost:11434/api/generate')
+
+
 model = Ollama(model='llama3.1')
 
 
@@ -97,3 +109,4 @@ if input := st.chat_input("What is up?"):
     # Display AI assistant response and save to message history.
     st.chat_message("assistant").write(str(response))
     msgs.add_ai_message(response)
+
